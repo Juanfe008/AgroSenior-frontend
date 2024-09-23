@@ -38,7 +38,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-green-100">
+    <div>
       {/* Navbar */}
       <nav className="bg-green-900 text-white p-4">
         <div className="container mx-auto flex justify-center items-center">
