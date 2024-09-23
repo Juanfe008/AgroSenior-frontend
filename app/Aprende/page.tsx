@@ -12,11 +12,11 @@ export default function Aprende() {
             <nav className="bg-green-900 text-white p-4">
                 <div className="container mx-auto flex justify-between items-center">
                     <Link href="/ActionPanel">
-                            <button className="bg-blue-500 rounded p-2">
-                                REGRESAR
-                            </button>
+                        <button className="bg-blue-500 rounded p-2">
+                            REGRESAR
+                        </button>
                     </Link>
-                    <div className="text-4xl font-bold">Selecciona tu Nivel de Aprendizaje</div>
+                    <div className="text-4xl font-bold">Escoge un nivel</div>
                     <button className="bg-red-500 rounded p-2">
                         SALIR
                     </button>
@@ -36,27 +36,32 @@ export default function Aprende() {
                     ))}
                     {selectedLevel !== null && (
                         <div className="w-full mt-8">
-                            <div className="w-1/2 mx-auto bg-blue-500 p-2 rounded-full">
-                                <div className="bg-white h-2 rounded-full">
-                                    <div className="h-2 bg-green-500 rounded-full" style={{ width: '50%' }}></div>
-                                </div>
-                            </div>
+                            <button className="bg-blue-500 text-white py-2 px-4 rounded" onClick={() => setSelectedLevel(null)}>Regresar a los Niveles</button>
                             <div className="mt-4">
                                 <h2 className="text-2xl font-bold">Contenido del Nivel {selectedLevel + 1}</h2>
                                 <div className="flex flex-col gap-4 mt-4">
                                     {[1, 2, 3, 4, 5].map((content, index) => (
+
                                         <div key={index} className="p-4 border-2 border-white rounded-lg">
-                                            <h3 className="text-xl font-bold">Contenido {content}</h3>
-                                            <p>Descripción del contenido {content}</p>
+                                            <Link href={`/Aprende/leccion/${index + 1}`}>
+                                                <h3 className="text-xl font-bold">Contenido {content}</h3>
+                                                <p>Descripción del contenido {content}</p>
+                                            </Link>
                                         </div>
+
                                     ))}
                                 </div>
+
                             </div>
-                            <button className="mt-4 bg-blue-500 text-white py-2 px-4 rounded" onClick={() => setSelectedLevel(null)}>Regresar a los Niveles</button>
+                            <div className="w-1/2 mx-auto mt-4 bg-blue-500 p-2 rounded-full">
+                                <div className="bg-white h-2 rounded-full">
+                                    <div className="h-2 bg-green-500 rounded-full" style={{ width: '50%' }}></div>
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
