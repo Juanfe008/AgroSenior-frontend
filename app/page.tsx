@@ -83,8 +83,8 @@ export default function Home() {
 
         {/* Botones "Soy nuevo" y "Ya tengo cuenta" */}
         <div className="flex justify-center space-x-4 mt-8 pb-15">
-          <button className="bg-purple-500 text-white py-4 px-12 rounded-lg text-4xl">Soy nuevo</button>
-          <button className="bg-green-500 text-white py-4 px-12 rounded-lg text-4xl">Ya tengo cuenta</button>
+          <button className="bg-purple-500 text-white py-4 px-12 rounded-lg text-4xl sm:text-2xl">Soy nuevo</button>
+          <button className="bg-green-500 text-white py-4 px-12 rounded-lg text-4xl sm:text-2xl">Ya tengo cuenta</button>
         </div>
       </div>
     </div>

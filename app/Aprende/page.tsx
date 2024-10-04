@@ -16,7 +16,7 @@ export default function Aprende() {
                             REGRESAR
                         </button>
                     </Link>
-                    <div className="text-4xl font-bold">Escoge un nivel</div>
+                    <div className="text-4xl font-bold">{selectedLevel !== null ? 'Escoge una lección' : 'Escoge un nivel'}</div>
                     <button className="bg-red-500 rounded p-2">
                         SALIR
                     </button>
@@ -25,13 +25,12 @@ export default function Aprende() {
             <div className="container mx-auto mt-8 bg-green-900 p-4 rounded-lg">
                 <div className="flex flex-col items-center gap-4">
                     {['Introducción', 'Componentes y Diseño', 'Técnicas de Cultivo', 'Avanzado', 'Experto'].map((level, index) => (
-                        <div key={index} className={`w-full flex flex-col items-center justify-center p-4 border-2 border-white rounded-lg ${selectedLevel !== null ? 'hidden' : ''}`}>
+                        <div key={index} className={`w-full flex flex-col items-center justify-center p-4 border-2 border-white rounded-lg ${selectedLevel !== null ? 'hidden' : ''}`} onClick={() => setSelectedLevel(index)} style={{ cursor: 'pointer' }}>
                             <div className="flex items-center gap-4">
                                 <img src={`icon-${index + 1}.png`} alt={`Icono Nivel ${index + 1}`} className="w-10 h-10" />
                                 <div className="text-xl font-bold">Nivel {index + 1}: {level}</div>
                             </div>
                             <p className="mt-2">Descripción breve del Nivel {index + 1}</p>
-                            <button className="mt-4 bg-green-500 text-white py-2 px-4 rounded" onClick={() => setSelectedLevel(index)}>Seleccionar</button>
                         </div>
                     ))}
                     {selectedLevel !== null && (
@@ -44,8 +43,8 @@ export default function Aprende() {
 
                                         <div key={index} className="p-4 border-2 border-white rounded-lg">
                                             <Link href={`/Aprende/leccion/${index + 1}`}>
-                                                <h3 className="text-xl font-bold">Contenido {content}</h3>
-                                                <p>Descripción del contenido {content}</p>
+                                                <h3 className="text-xl font-bold">Lección {content}</h3>
+                                                <p>Descripción de la lección {content}</p>
                                             </Link>
                                         </div>
 
