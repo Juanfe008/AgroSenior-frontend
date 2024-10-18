@@ -1,4 +1,3 @@
-// pages/leccion/[id].tsx
 import TextoGuia from "./components/TextoGuia";
 
 const LeccionPage: React.FC = () => {
