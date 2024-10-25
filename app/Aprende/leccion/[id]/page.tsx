@@ -1,9 +1,9 @@
-import TextoGuia from "./components/TextoGuia";
+import Leccion from "./components/Leccion";
 
 const LeccionPage: React.FC = () => {
     return (
         <div>
-            <TextoGuia />
+            <Leccion />
         </div>
     );
 };

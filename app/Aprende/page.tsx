@@ -1,10 +1,33 @@
-'use client'
+"use client";
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { fetchLeccionesByNivel } from './leccion/services/leccion.service';
 
 export default function Aprende() {
     const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
+    const [lecciones, setLecciones] = useState<any[]>([]); 
+    const [loading, setLoading] = useState<boolean>(false); 
+    const [error, setError] = useState<string | null>(null); 
+
+    useEffect(() => {
+        if (selectedLevel !== null) {
+            const nivelId = selectedLevel + 1; 
+            setLoading(true);
+            setError(null);
+
+            fetchLeccionesByNivel(nivelId.toString())
+                .then((data) => {
+                    setLecciones(data);
+                })
+                .catch((err) => {
+                    setError("Error al cargar las lecciones");
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }
+    }, [selectedLevel]);
 
     return (
         <div>
@@ -38,18 +61,27 @@ export default function Aprende() {
                             <button className="bg-blue-500 text-white py-2 px-4 rounded" onClick={() => setSelectedLevel(null)}>Regresar a los Niveles</button>
                             <div className="mt-4">
                                 <h2 className="text-2xl font-bold">Contenido del Nivel {selectedLevel + 1}</h2>
-                                <div className="flex flex-col gap-4 mt-4">
-                                    {[1, 2, 3, 4, 5].map((content, index) => (
 
-                                        <div key={index} className="p-4 border-2 border-white rounded-lg">
-                                            <Link href={`/Aprende/leccion/${index + 1}`}>
-                                                <h3 className="text-xl font-bold">Lección {content}</h3>
-                                                <p>Descripción de la lección {content}</p>
-                                            </Link>
-                                        </div>
-
-                                    ))}
-                                </div>
+                                {loading ? (
+                                    <p>Cargando lecciones...</p>
+                                ) : error ? (
+                                    <p className="text-red-500">{error}</p>
+                                ) : (
+                                    <div className="flex flex-col gap-4 mt-4">
+                                        {lecciones.length > 0 ? (
+                                            lecciones.map((leccion, index) => (
+                                                <div key={index} className="p-4 border-2 border-white rounded-lg">
+                                                    <Link href={`/Aprende/leccion/${leccion.id}`}>
+                                                        <h3 className="text-xl font-bold">{leccion.title}</h3>
+                                                        <p>{leccion.desc}</p>
+                                                    </Link>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p>No hay lecciones disponibles para este nivel</p>
+                                        )}
+                                    </div>
+                                )}
 
                             </div>
                             <div className="w-1/2 mx-auto mt-4 bg-blue-500 p-2 rounded-full">

@@ -1,5 +1,11 @@
-interface Leccion {
+import { Card } from "./Card";
+
+export interface LeccionData {
     id: number;
     title: string;
-    cards: Card[];
+    desc: string;
+    imgUrl?: string;  
+    tipo: 'texto' | 'infografia';  
+    nivelId?: number;
+    cards?: Card[]; 
 }
