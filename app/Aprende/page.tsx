@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { fetchLeccionesByNivel } from './leccion/services/leccion.service';
+import Navbar from '../components/Navbar';
 
 export default function Aprende() {
     const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
@@ -31,20 +32,7 @@ export default function Aprende() {
 
     return (
         <div>
-            {/* Navbar */}
-            <nav className="bg-green-900 text-white p-4">
-                <div className="container mx-auto flex justify-between items-center">
-                    <Link href="/ActionPanel">
-                        <button className="bg-blue-500 rounded p-2">
-                            REGRESAR
-                        </button>
-                    </Link>
-                    <div className="text-4xl font-bold">{selectedLevel !== null ? 'Escoge una lección' : 'Escoge un nivel'}</div>
-                    <button className="bg-red-500 rounded p-2">
-                        SALIR
-                    </button>
-                </div>
-            </nav>
+            <Navbar backRoute='/ActionPanel' title={`${selectedLevel !== null ? 'Escoge una lección' : 'Escoge un nivel'}`}/>
             <div className="container mx-auto mt-8 bg-green-900 p-4 rounded-lg">
                 <div className="flex flex-col items-center gap-4">
                     {['Introducción', 'Componentes y Diseño', 'Técnicas de Cultivo', 'Avanzado', 'Experto'].map((level, index) => (

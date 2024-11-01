@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchCuestionario } from '../services/cuestionario.service';
+import Navbar from '@/app/components/Navbar';
 
 const Cuestionario: React.FC = () => {
     const { id } = useParams();
@@ -116,15 +117,7 @@ const Cuestionario: React.FC = () => {
 
     return (
         <div>
-            <nav className="bg-green-900 text-white p-4">
-                <div className="container mx-auto flex justify-between items-center">
-                    <Link href="/Aprende">
-                        <button className="bg-blue-500 rounded p-2">REGRESAR</button>
-                    </Link>
-                    <div className="text-4xl font-bold">Cuestionario {cuestionario?.id}</div>
-                    <button className="bg-red-500 rounded p-2">SALIR</button>
-                </div>
-            </nav>
+            <Navbar backRoute='/Aprende' title={`Cuestionario ${cuestionario?.id}`} />
             <div className="min-h-screen bg-gray-100 flex items-start justify-center p-4">
                 <div className="max-w-3xl w-full bg-white shadow-lg rounded-lg p-8">
                     <div className="relative overflow-hidden h-64">
