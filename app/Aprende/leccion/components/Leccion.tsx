@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { fetchLeccionById } from '../../services/leccion.service';
-import { LeccionData } from '../../interfaces/Leccion';
+import { fetchLeccionById } from '../services/leccion.service';
+import { LeccionData } from '../interfaces/Leccion';
 import TextoGuia from './TextoGuia';
 import Infografia from './Infografia';
 
@@ -32,9 +32,9 @@ const Leccion: React.FC = () => {
 
     switch (leccion.tipo) {
         case 'texto':
-            return <TextoGuia leccion={leccion} />;
+            return <TextoGuia {...leccion} />;
         case 'infografia':
-            return <Infografia leccion={leccion} />;
+            return <Infografia {...leccion} />;
         default:
             return <p>Tipo de lección no reconocido</p>;
     }

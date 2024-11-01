@@ -7,5 +7,6 @@ export interface LeccionData {
     imgUrl?: string;  
     tipo: 'texto' | 'infografia';  
     nivelId?: number;
+    cuestionarioId: number|null
     cards?: Card[]; 
 }

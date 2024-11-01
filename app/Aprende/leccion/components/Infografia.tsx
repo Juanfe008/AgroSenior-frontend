@@ -1,13 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { LeccionData } from '../../interfaces/Leccion';
+import { LeccionData } from '../interfaces/Leccion';
 
-interface InfografiaProps {
-    leccion: LeccionData;
-}
-
-const Infografia: React.FC<InfografiaProps> = ({ leccion }) => {
+const Infografia: React.FC<LeccionData> = (leccion) => {
     return (
         <div>
             {/* Navbar */}

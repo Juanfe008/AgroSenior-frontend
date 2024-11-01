@@ -1,4 +1,4 @@
-import Leccion from "./components/Leccion";
+import Leccion from "../components/Leccion";
 
 const LeccionPage: React.FC = () => {
     return (

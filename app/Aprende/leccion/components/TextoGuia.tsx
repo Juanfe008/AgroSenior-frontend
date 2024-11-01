@@ -4,34 +4,25 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from 'next/link';
-import { Card } from '../../interfaces/Card'
+import { LeccionData } from "../interfaces/Leccion";
 
-interface LeccionData {
-    id: number;
-    title: string;
-    tipo: 'texto' | 'infografia';
-    cards: Card[];
-}
-
-interface TextoGuiaProps {
-    leccion: LeccionData;
-}
-
-const TextoGuia: React.FC<TextoGuiaProps> = ({ leccion }) => {
+const TextoGuia: React.FC<LeccionData> = (leccion) => {
     const [cardActiva, setCardActiva] = useState(0);
 
     const siguienteCard = () => {
-        if (leccion.cards && leccion.cards.length > 0) {
-            setCardActiva((prev) => (prev + 1) % leccion.cards.length);
+        const cards = leccion.cards ?? []; 
+        if (cards.length > 0) {
+            setCardActiva((prev) => (prev + 1) % cards.length);
         }
     };
-
+    
     const anteriorCard = () => {
-        if (leccion.cards && leccion.cards.length > 0) {
-            setCardActiva((prev) => (prev === 0 ? leccion.cards.length - 1 : prev - 1));
+        const cards = leccion.cards ?? []; 
+        if (cards.length > 0) {
+            setCardActiva((prev) => (prev === 0 ? cards.length - 1 : prev - 1));
         }
     };
-
+    
     const slideVariants = {
         hidden: (direction: number) => ({
             x: direction > 0 ? 300 : -300,
@@ -110,17 +101,32 @@ const TextoGuia: React.FC<TextoGuiaProps> = ({ leccion }) => {
                         >
                             Anterior
                         </button>
-                        <button
-                            onClick={siguienteCard}
-                            disabled={cardActiva === leccion.cards.length - 1}
-                            className={`px-4 py-2 rounded-lg shadow-md ${
-                                cardActiva === leccion.cards.length - 1
-                                    ? "bg-gray-400"
-                                    : "bg-blue-500 hover:bg-blue-600"
-                            } text-white`}
-                        >
-                            Siguiente
-                        </button>
+
+                        {cardActiva === leccion.cards.length - 1 ? (
+                            leccion.cuestionarioId ? (
+                                <Link href={`/Aprende/cuestionario/${leccion.cuestionarioId}`}>
+                                    <button className="px-4 py-2 rounded-lg shadow-md bg-green-500 hover:bg-green-600 text-white">
+                                        Cuestionario
+                                    </button>
+                                </Link>
+                            ) : (
+                                <button className="px-4 py-2 rounded-lg shadow-md bg-green-500 hover:bg-green-600 text-white">
+                                    Finalizar Lección
+                                </button>
+                            )
+                        ) : (
+                            <button
+                                onClick={siguienteCard}
+                                disabled={cardActiva === leccion.cards.length - 1}
+                                className={`px-4 py-2 rounded-lg shadow-md ${
+                                    cardActiva === leccion.cards.length - 1
+                                        ? "bg-gray-400"
+                                        : "bg-blue-500 hover:bg-blue-600"
+                                } text-white`}
+                            >
+                                Siguiente
+                            </button>
+                        )}
                     </div>
                 </div>
             ) : (
