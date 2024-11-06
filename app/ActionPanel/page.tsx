@@ -2,17 +2,34 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 
 const cards = [
     { src: 'images/Aprende.jpg', text: 'APRENDE', link: '/Aprende' },
     { src: 'images/Huerto.jpg', text: 'HUERTO', link: '/Huerto' },
     { src: 'images/Foro.jpg', text: 'FORO', link: '/Foro' },
     { src: 'images/Actividades.jpg', text: 'ACTIVIDADES', link: '/Actividades' },
-    { src: 'images/Perfil.jpg', text: 'PERFIL', link: '/Profile' },
+    { src: 'images/Perfil.jpg', text: 'PERFIL', link: `/Profile/` },
     { src: 'images/Configuración.jpg', text: 'CONFIGURACIÓN', link: '/Settings' },
 ];
 
 export default function ActionPanel() {
+    const [userId, setUserId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const storedUserId = localStorage.getItem('userId');
+        if (storedUserId) {
+            setUserId(storedUserId);
+        }
+    }, []);
+
+    const updatedCards = cards.map((card) => {
+        if (card.text === 'PERFIL' && userId) {
+            return { ...card, link: `/Profile/${userId}` };
+        }
+        return card;
+    });
+
     return (
         <div>
             {/* Navbar */}
@@ -25,7 +42,7 @@ export default function ActionPanel() {
             {/* Acciones */}
             <div className="container mx-auto mt-8 flex flex-wrap justify-center gap-4">
                 <div className="flex flex-wrap justify-center gap-4">
-                    {cards.slice(0, 3).map((card, index) => (
+                    {updatedCards.slice(0, 3).map((card, index) => (
                         <Link key={index} href={card.link}>
                             <motion.div
                                 whileHover={{ scale: 1.1 }}
@@ -45,7 +62,7 @@ export default function ActionPanel() {
                     ))}
                 </div>
                 <div className="flex flex-wrap justify-center gap-4 mt-4">
-                    {cards.slice(3, 6).map((card, index) => (
+                    {updatedCards.slice(3, 6).map((card, index) => (
                         <Link key={index} href={card.link}>
                             <motion.div
                                 whileHover={{ scale: 1.1 }}

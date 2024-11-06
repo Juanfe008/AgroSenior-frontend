@@ -16,8 +16,10 @@ const Login: React.FC<LoginProps> = ({ onClose, onLoginSuccess }) => {
         setError('');
 
         try {
-            const accessToken = await loginUser({ username, email: '', password });
-            onLoginSuccess(); 
+            const { access_token, userId } = await loginUser({ username, email: '', password });
+            localStorage.setItem('token', access_token);
+            localStorage.setItem('userId', userId.toString());
+            onLoginSuccess();
             onClose();
         } catch (error) {
             setError("Error al iniciar sesión.");

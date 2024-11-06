@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { fetchCuestionario } from '../services/cuestionario.service';
+import { fetchCuestionario, registrarCuestionarioCompletado } from '../services/cuestionario.service';
 import Navbar from '@/app/components/Navbar';
 
 const Cuestionario: React.FC = () => {
@@ -17,11 +17,13 @@ const Cuestionario: React.FC = () => {
     const [respuestaSeleccionada, setRespuestaSeleccionada] = useState<{ opcionSeleccionada: number | null; respuestaCorrecta: number | null }[]>([]);
     const [puntaje, setPuntaje] = useState<number>(0);
     const [finalizado, setFinalizado] = useState<boolean>(false);
+    const [mensajeFinalizacion, setMensajeFinalizacion] = useState<string | null>(null);
+    const [userId, setUserId] = useState<number | null>(null);
 
     const cuestionarioId = typeof id === 'string' ? parseInt(id) : 1;
 
     useEffect(() => {
-        const cargarCuestionario = async () => { 
+        const cargarCuestionario = async () => {
             setLoading(true);
             try {
                 const data = await fetchCuestionario(cuestionarioId);
@@ -36,6 +38,11 @@ const Cuestionario: React.FC = () => {
         };
 
         cargarCuestionario();
+        
+        const storedUserId = localStorage.getItem('userId');
+        if (storedUserId) {
+            setUserId(parseInt(storedUserId));
+        }
     }, [cuestionarioId]);
 
     const siguientePregunta = () => {
@@ -70,8 +77,24 @@ const Cuestionario: React.FC = () => {
         }
     };
 
-    const finalizarCuestionario = () => {
+    const finalizarCuestionario = async () => {
+        const totalPreguntas = cuestionario?.preguntas.length || 1;
+        const calificacion = (puntaje / totalPreguntas) * 100;
         setFinalizado(true);
+
+        const expGanada = puntaje * 10;
+
+        if (calificacion >= 60 && userId !== null) {
+            try {
+                const response = await registrarCuestionarioCompletado(userId, cuestionarioId, expGanada);
+                setMensajeFinalizacion(response.message);
+            } catch (error) {
+                setMensajeFinalizacion('Este cuestionario ya fue aprobado.');
+            }
+        }
+        else {
+            setMensajeFinalizacion('La calificación fue menor al 60%, no se registrará el cuestionario como completado')
+        }
     };
 
     const todasPreguntasContestadas = preguntasContestadas.every(contestada => contestada);
@@ -108,6 +131,7 @@ const Cuestionario: React.FC = () => {
                 <h2 className="text-3xl font-bold mb-4">¡Cuestionario Finalizado!</h2>
                 <p className="text-2xl">Puntaje: {puntaje} / {totalPreguntas}</p>
                 <p className="text-2xl">Calificación: {calificacion}%</p>
+                {mensajeFinalizacion && <p className="mt-4 text-lg">{mensajeFinalizacion}</p>}
                 <Link href="/Aprende">
                     <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Volver al Inicio</button>
                 </Link>
@@ -153,7 +177,7 @@ const Cuestionario: React.FC = () => {
                                                 <button
                                                     key={opcion.id}
                                                     onClick={() => handleOpcionClick(opcion.id, opcion.esCorrecta)}
-                                                    disabled={preguntasContestadas[preguntaActiva]} 
+                                                    disabled={preguntasContestadas[preguntaActiva]}
                                                     className={`m-2 px-4 py-2 rounded-full w-11/12 text-white ${colorClase}`}
                                                 >
                                                     {opcion.texto}
@@ -169,9 +193,8 @@ const Cuestionario: React.FC = () => {
                         <button
                             onClick={anteriorPregunta}
                             disabled={preguntaActiva === 0}
-                            className={`px-4 py-2 rounded-lg shadow-md ${
-                                preguntaActiva === 0 ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'
-                            } text-white`}
+                            className={`px-4 py-2 rounded-lg shadow-md ${preguntaActiva === 0 ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'
+                                } text-white`}
                         >
                             Anterior
                         </button>
@@ -181,11 +204,10 @@ const Cuestionario: React.FC = () => {
                                 (esUltimaPregunta && !todasPreguntasContestadas) ||
                                 !cuestionario?.preguntas?.length
                             }
-                            className={`px-4 py-2 rounded-lg shadow-md ${
-                                (esUltimaPregunta && !todasPreguntasContestadas) || !cuestionario?.preguntas?.length
+                            className={`px-4 py-2 rounded-lg shadow-md ${(esUltimaPregunta && !todasPreguntasContestadas) || !cuestionario?.preguntas?.length
                                     ? 'bg-gray-400'
                                     : 'bg-blue-500 hover:bg-blue-600'
-                            } text-white`}
+                                } text-white`}
                         >
                             {esUltimaPregunta ? 'Finalizar cuestionario' : 'Siguiente'}
                         </button>

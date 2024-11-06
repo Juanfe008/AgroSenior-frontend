@@ -23,7 +23,7 @@ export const registerUser = async (credentials: UserCredentials): Promise<void> 
     console.log("User registered successfully:", data);
 };
 
-export const loginUser = async (credentials: UserCredentials): Promise<string> => {
+export const loginUser = async (credentials: UserCredentials): Promise<{ access_token: string; userId: number }> => {
     const response = await fetch(`${API_URL}login`, {
         method: 'POST',
         headers: {
@@ -37,6 +37,5 @@ export const loginUser = async (credentials: UserCredentials): Promise<string> =
     }
 
     const data = await response.json();
-    console.log("Access token:", data.access_token);
-    return data.access_token;
+    return { access_token: data.access_token, userId: data.userId };
 };
