@@ -2,80 +2,50 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import Navbar from '../components/Navbar';
+import { useSettings } from '../contexts/SettingsContext';
 
 const cards = [
     { src: 'images/Aprende.jpg', text: 'APRENDE', link: '/Aprende' },
     { src: 'images/Huerto.jpg', text: 'HUERTO', link: '/Huerto' },
     { src: 'images/Foro.jpg', text: 'FORO', link: '/Foro' },
     { src: 'images/Actividades.jpg', text: 'ACTIVIDADES', link: '/Actividades' },
-    { src: 'images/Perfil.jpg', text: 'PERFIL', link: `/Profile/` },
+    { src: 'images/Perfil.jpg', text: 'PERFIL', link: '/Profile' },
     { src: 'images/Configuración.jpg', text: 'CONFIGURACIÓN', link: '/Settings' },
 ];
 
-export default function ActionPanel() {
-    const [userId, setUserId] = useState<string | null>(null);
-
-    useEffect(() => {
-        const storedUserId = localStorage.getItem('userId');
-        if (storedUserId) {
-            setUserId(storedUserId);
-        }
-    }, []);
-
-    const updatedCards = cards.map((card) => {
-        if (card.text === 'PERFIL' && userId) {
-            return { ...card, link: `/Profile/${userId}` };
-        }
-        return card;
-    });
+const ActionPanel: React.FC = () => {
+    const { theme } = useSettings();
+    const isDark = theme === 'dark';
 
     return (
-        <div>
-            {/* Navbar */}
-            <nav className="bg-green-900 text-white p-4">
-                <div className="container mx-auto flex justify-between items-center">
-                    <div className="text-4xl font-bold">¿QUE QUIERES HACER?</div>
-                    <button className="bg-red-500 rounded p-2">SALIR</button>
-                </div>
-            </nav>
-            {/* Acciones */}
-            <div className="container mx-auto mt-8 flex flex-wrap justify-center gap-4">
-                <div className="flex flex-wrap justify-center gap-4">
-                    {updatedCards.slice(0, 3).map((card, index) => (
+        <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-100'}`}>
+            <Navbar title="¿QUE QUIERES HACER?" />
+            <div className="container mx-auto px-4 py-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {cards.map((card, index) => (
                         <Link key={index} href={card.link}>
                             <motion.div
-                                whileHover={{ scale: 1.1 }}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3 }}
+                                whileHover={{ scale: 1.05, boxShadow: isDark ? '0px 10px 20px rgba(255, 255, 255, 0.1)' : '0px 10px 20px rgba(0, 0, 0, 0.2)' }}
                                 whileTap={{ scale: 0.95 }}
-                                className="w-64 h-64 flex flex-col items-center justify-center"
+                                className={`w-full h-64 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ${
+                                    isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white'
+                                }`}
                             >
                                 <img
                                     src={card.src}
                                     alt={`Card ${index + 1}`}
-                                    className="w-full h-3/4 object-cover"
+                                    className={`w-full h-3/4 object-cover ${isDark ? 'opacity-90' : ''}`}
                                 />
-                                <div className="w-full h-1/4 flex items-center justify-center bg-blue-500">
-                                    <p className="text-center text-white">{card.text}</p>
-                                </div>
-                            </motion.div>
-                        </Link>
-                    ))}
-                </div>
-                <div className="flex flex-wrap justify-center gap-4 mt-4">
-                    {updatedCards.slice(3, 6).map((card, index) => (
-                        <Link key={index} href={card.link}>
-                            <motion.div
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="w-64 h-64 flex flex-col items-center justify-center"
-                            >
-                                <img
-                                    src={card.src}
-                                    alt={`Card ${index + 4}`}
-                                    className="w-full h-3/4 object-cover"
-                                />
-                                <div className="w-full h-1/4 flex items-center justify-center bg-blue-500">
-                                    <p className="text-center text-white">{card.text}</p>
+                                <div className={`w-full h-1/4 flex items-center justify-center ${
+                                    isDark 
+                                        ? 'bg-blue-800 hover:bg-blue-900' 
+                                        : 'bg-blue-600 hover:bg-blue-700'
+                                } transition-colors duration-300`}>
+                                    <p className="text-center text-white font-semibold text-lg">{card.text}</p>
                                 </div>
                             </motion.div>
                         </Link>
@@ -85,3 +55,5 @@ export default function ActionPanel() {
         </div>
     );
 }
+
+export default ActionPanel;

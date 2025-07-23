@@ -1,10 +1,18 @@
-const API_URL = 'http://localhost:3001/foro'; 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
+const API_URL = API_BASE_URL + "/foro";
 
 export interface CreatePostDto {
   title: string;
   content: string;
   userId: number;
   parentPostId?: number;
+}
+
+export interface UpdatePostDto {
+  title?: string; 
+  content?: string; 
+  imageUrl?: string; 
+  parentPostId?: number | null; 
 }
 
 export interface CreatePostLikeDto {
@@ -28,6 +36,17 @@ export const createPost = async (formData: FormData) => {
 export const getPosts = async (userId: number) => {
   const response = await fetch(`${API_URL}/posts?userId=${userId}`, {
     method: 'GET',
+  });
+  return response.json();
+};
+
+export const updatePost = async (postId: number, updatePostDto: UpdatePostDto) => {
+  const response = await fetch(`${API_URL}/posts/${postId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(updatePostDto),
   });
   return response.json();
 };

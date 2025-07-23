@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { fetchCuestionario, registrarCuestionarioCompletado } from '../services/cuestionario.service';
 import Navbar from '@/app/components/Navbar';
+import ResultadoFinal from '../components/ResultadoFinal';
+import Pregunta from '../components/Pregunta';
+import { useSettings } from '@/app/contexts/SettingsContext';
 
 const Cuestionario: React.FC = () => {
     const { id } = useParams();
@@ -19,6 +21,8 @@ const Cuestionario: React.FC = () => {
     const [finalizado, setFinalizado] = useState<boolean>(false);
     const [mensajeFinalizacion, setMensajeFinalizacion] = useState<string | null>(null);
     const [userId, setUserId] = useState<number | null>(null);
+    const { theme } = useSettings();
+    const isDark = theme === 'dark';
 
     const cuestionarioId = typeof id === 'string' ? parseInt(id) : 1;
 
@@ -38,7 +42,7 @@ const Cuestionario: React.FC = () => {
         };
 
         cargarCuestionario();
-        
+
         const storedUserId = localStorage.getItem('userId');
         if (storedUserId) {
             setUserId(parseInt(storedUserId));
@@ -100,117 +104,83 @@ const Cuestionario: React.FC = () => {
     const todasPreguntasContestadas = preguntasContestadas.every(contestada => contestada);
     const esUltimaPregunta = cuestionario?.preguntas && preguntaActiva === cuestionario.preguntas.length - 1;
 
-    const slideVariants = {
-        hidden: (direction: number) => ({
-            x: direction > 0 ? 300 : -300,
-            opacity: 0,
-        }),
-        visible: {
-            x: 0,
-            opacity: 1,
-        },
-        exit: (direction: number) => ({
-            x: direction > 0 ? -300 : 300,
-            opacity: 0,
-        }),
-    };
-
     if (loading) {
-        return <div>Cargando cuestionario...</div>;
+        return <div className={isDark ? 'text-gray-200' : ''}>Cargando cuestionario...</div>;
     }
 
     if (error) {
-        return <div>{error}</div>;
+        return <div className={isDark ? 'text-gray-200' : ''}>{error}</div>;
     }
 
     if (finalizado) {
         const totalPreguntas = cuestionario?.preguntas.length || 1;
         const calificacion = ((puntaje / totalPreguntas) * 100).toFixed(2);
+
         return (
-            <div className="flex flex-col items-center text-black">
-                <h2 className="text-3xl font-bold mb-4">¡Cuestionario Finalizado!</h2>
-                <p className="text-2xl">Puntaje: {puntaje} / {totalPreguntas}</p>
-                <p className="text-2xl">Calificación: {calificacion}%</p>
-                {mensajeFinalizacion && <p className="mt-4 text-lg">{mensajeFinalizacion}</p>}
-                <Link href="/Aprende">
-                    <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Volver al Inicio</button>
-                </Link>
-            </div>
+            <ResultadoFinal
+                puntaje={puntaje}
+                totalPreguntas={totalPreguntas}
+                calificacion={calificacion}
+                mensajeFinalizacion={mensajeFinalizacion}
+            />
         );
     }
 
     return (
-        <div>
-            <Navbar backRoute='/Aprende' title={`Cuestionario ${cuestionario?.id}`} />
-            <div className="min-h-screen bg-gray-100 flex items-start justify-center p-4">
-                <div className="max-w-3xl w-full bg-white shadow-lg rounded-lg p-8">
-                    <div className="relative overflow-hidden h-64">
+        <div className={isDark ? 'bg-gray-900' : ''}>
+            <Navbar backRoute='/Aprende' title={`Cuestionario`} />
+            <div className={`min-h-screen flex items-start justify-center p-6 ${
+                isDark ? 'bg-gradient-to-br from-gray-900 to-gray-800' : 'bg-gradient-to-br from-blue-50 to-purple-50'
+            }`}>
+                <div className={`max-w-3xl w-full shadow-2xl rounded-xl overflow-hidden ${
+                    isDark ? 'bg-gray-800' : 'bg-white'
+                }`}>
+                    {/* Contenedor de la pregunta */}
+                    <div className="relative min-h-[24rem] max-h-[80vh] overflow-auto">
                         <AnimatePresence custom={preguntaActiva}>
-                            <motion.div
-                                key={cuestionario?.preguntas[preguntaActiva].id}
-                                className="absolute w-full h-full flex flex-col items-center justify-center"
-                                variants={slideVariants}
-                                initial="hidden"
-                                animate="visible"
-                                exit="exit"
-                                custom={preguntaActiva}
-                                transition={{ duration: 0.5 }}
-                            >
-                                <div className="bg-gray-100 p-6 rounded-lg shadow-lg w-full max-w-6xl">
-                                    <h2 className="text-xl font-semibold text-center mb-4 text-black">
-                                        {cuestionario?.preguntas[preguntaActiva].texto}
-                                    </h2>
-                                    <div className="flex flex-col items-center">
-                                        {cuestionario?.preguntas[preguntaActiva].opciones.map((opcion) => {
-                                            const seleccion = respuestaSeleccionada[preguntaActiva];
-                                            const esCorrecta = opcion.id === seleccion.respuestaCorrecta;
-                                            const esSeleccionada = opcion.id === seleccion.opcionSeleccionada;
-                                            const colorClase = esSeleccionada
-                                                ? esCorrecta
-                                                    ? 'bg-green-500'
-                                                    : 'bg-red-500'
-                                                : esCorrecta
-                                                    ? 'bg-green-500'
-                                                    : 'bg-blue-500 hover:bg-blue-600';
-
-                                            return (
-                                                <button
-                                                    key={opcion.id}
-                                                    onClick={() => handleOpcionClick(opcion.id, opcion.esCorrecta)}
-                                                    disabled={preguntasContestadas[preguntaActiva]}
-                                                    className={`m-2 px-4 py-2 rounded-full w-11/12 text-white ${colorClase}`}
-                                                >
-                                                    {opcion.texto}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            </motion.div>
+                            {cuestionario && (
+                                <Pregunta
+                                    key={cuestionario.preguntas[preguntaActiva].id}
+                                    pregunta={cuestionario.preguntas[preguntaActiva]}
+                                    respuestaSeleccionada={respuestaSeleccionada[preguntaActiva]}
+                                    preguntaContestada={preguntasContestadas[preguntaActiva]}
+                                    handleOpcionClick={handleOpcionClick}
+                                />
+                            )}
                         </AnimatePresence>
                     </div>
-                    <div className="mt-8 flex justify-between">
-                        <button
-                            onClick={anteriorPregunta}
-                            disabled={preguntaActiva === 0}
-                            className={`px-4 py-2 rounded-lg shadow-md ${preguntaActiva === 0 ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'
-                                } text-white`}
-                        >
-                            Anterior
-                        </button>
-                        <button
-                            onClick={esUltimaPregunta ? finalizarCuestionario : siguientePregunta}
-                            disabled={
-                                (esUltimaPregunta && !todasPreguntasContestadas) ||
-                                !cuestionario?.preguntas?.length
-                            }
-                            className={`px-4 py-2 rounded-lg shadow-md ${(esUltimaPregunta && !todasPreguntasContestadas) || !cuestionario?.preguntas?.length
-                                    ? 'bg-gray-400'
-                                    : 'bg-blue-500 hover:bg-blue-600'
-                                } text-white`}
-                        >
-                            {esUltimaPregunta ? 'Finalizar cuestionario' : 'Siguiente'}
-                        </button>
+
+                    {/* Botones de navegación */}
+                    <div className={`p-6 border-t ${
+                        isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'
+                    }`}>
+                        <div className="flex justify-between">
+                            <button
+                                onClick={anteriorPregunta}
+                                disabled={preguntaActiva === 0}
+                                className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                                    preguntaActiva === 0
+                                        ? isDark ? 'bg-gray-600 text-gray-400 cursor-not-allowed' : 'bg-gray-300 cursor-not-allowed'
+                                        : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                }`}
+                            >
+                                Anterior
+                            </button>
+                            <button
+                                onClick={esUltimaPregunta ? finalizarCuestionario : siguientePregunta}
+                                disabled={
+                                    (esUltimaPregunta && !todasPreguntasContestadas) ||
+                                    !cuestionario?.preguntas?.length
+                                }
+                                className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                                    (esUltimaPregunta && !todasPreguntasContestadas) || !cuestionario?.preguntas?.length
+                                        ? isDark ? 'bg-gray-600 text-gray-400 cursor-not-allowed' : 'bg-gray-300 cursor-not-allowed'
+                                        : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                }`}
+                            >
+                                {esUltimaPregunta ? 'Finalizar cuestionario' : 'Siguiente'}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

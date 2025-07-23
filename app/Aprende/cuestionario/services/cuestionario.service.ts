@@ -1,4 +1,5 @@
-const API_URL = "http://localhost:3001/cuestionarios/";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
+const API_URL = API_BASE_URL + "/cuestionarios/";
 
 export const fetchCuestionario = async (id: number) => {    
     try {
